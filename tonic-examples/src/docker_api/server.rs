@@ -29,13 +29,14 @@ impl GetDocker for MyGreeter {
         let string = &self.data;
 
         println!("My data: {:?}", string);
+        println!("Into inner of request: {:?}", request.into_inner());
 
         // let reply = hello_world::HelloReply {
         //     message: "Zomg, it works!".into(),
         // };
         println!("Before wait");
         let info  = get_info();
-        println!("After wait {}", info);
+        println!("After wait");
         let reply = docker_api::DockerInfoReply {
             info: serde_json::to_string_pretty(&info).unwrap(),
         };

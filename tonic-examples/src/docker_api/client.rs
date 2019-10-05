@@ -14,7 +14,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     let response = client.get_docker_info(request).await?;
 
-    println!("RESPONSE={:?}", response);
+    println!("RESPONSE={}", response.into_inner().info);
     // let request = tonic::Request::new(DockerRequest {
     //     name: "hello".into(),
     // });
