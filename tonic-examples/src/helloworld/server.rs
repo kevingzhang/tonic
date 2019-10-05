@@ -1,12 +1,16 @@
 use tonic::{transport::Server, Request, Response, Status};
+//use docktape::*;
+use docktape::{Docker, Socket};
 
-pub mod hello_world {
-    tonic::include_proto!("helloworld");
+use serde_json;
+//use serde_json::Value;
+pub mod docker_api {
+    tonic::include_proto!("docker_api");
 }
 
-use hello_world::{
-    server::{Greeter, GreeterServer},
-    HelloReply, HelloRequest,
+use docker_api::{
+    server::{GetDocker, GetDockerServer},
+    DockerReply, DockerRequest,
 };
 
 #[derive(Default)]
@@ -15,23 +19,71 @@ pub struct MyGreeter {
 }
 
 #[tonic::async_trait]
-impl Greeter for MyGreeter {
-    async fn say_hello(
+impl GetDocker for MyGreeter {
+    async fn get_docker_info(
         &self,
-        request: Request<HelloRequest>,
-    ) -> Result<Response<HelloReply>, Status> {
+        request: Request<DockerRequest>,
+    ) -> Result<Response<DockerReply>, Status> {
         println!("Got a request: {:?}", request);
 
         let string = &self.data;
 
         println!("My data: {:?}", string);
 
-        let reply = hello_world::HelloReply {
-            message: "Zomg, it works!".into(),
+        // let reply = hello_world::HelloReply {
+        //     message: "Zomg, it works!".into(),
+        // };
+        println!("Before wait");
+        let info  = get_info();
+        println!("After wait ");
+        let reply = docker_api::DockerReply {
+            message: info.to_string(),
+        };
+        Ok(Response::new(reply))
+    }
+
+    async fn get_docker_images(
+        &self,
+        request: Request<DockerRequest>,
+    ) -> Result<Response<DockerReply>, Status> {
+        println!("Got a request: {:?}", request);
+
+        let string = &self.data;
+
+        println!("My data: {:?}", string);
+
+        // let reply = hello_world::HelloReply {
+        //     message: "Zomg, it works!".into(),
+        // };
+        println!("Before wait");
+        get_images();
+        println!("After wait ");
+        let reply = docker_api::DockerReply {
+            message: "imnages".to_string(),
         };
         Ok(Response::new(reply))
     }
 }
+
+fn get_info() -> serde_json::Value {
+    let socket = Socket::new("/var/run/docker.sock");
+    let mut docker = Docker::new(socket.clone());
+    let _info : serde_json::Value = docker.get_info().unwrap();
+    _info
+}
+
+fn get_images() {
+    let socket = Socket::new("/var/run/docker.sock");
+    let mut docker = Docker::new(socket.clone());
+    let _images = docker.get_images().unwrap();
+    
+    for image in &_images {
+    	println!("{} -> repoTags: {:?}", image.id(), image.repo_tags());
+    }
+    ;
+}
+
+
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -39,7 +91,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let greeter = MyGreeter::default();
 
     Server::builder()
-        .serve(addr, GreeterServer::new(greeter))
+        .serve(addr, GetDockerServer::new(greeter))
         .await?;
 
     Ok(())
