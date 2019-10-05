@@ -10,7 +10,7 @@ pub mod docker_api {
 
 use docker_api::{
     server::{GetDocker, GetDockerServer},
-    DockerReply, DockerRequest,
+    DockerReply, DockerRequest,DockerInfoReply, DockerInfoRequest
 };
 
 #[derive(Default)]
@@ -22,8 +22,8 @@ pub struct MyGreeter {
 impl GetDocker for MyGreeter {
     async fn get_docker_info(
         &self,
-        request: Request<DockerRequest>,
-    ) -> Result<Response<DockerReply>, Status> {
+        request: Request<DockerInfoRequest>,
+    ) -> Result<Response<DockerInfoReply>, Status> {
         println!("Got a request: {:?}", request);
 
         let string = &self.data;
@@ -35,9 +35,9 @@ impl GetDocker for MyGreeter {
         // };
         println!("Before wait");
         let info  = get_info();
-        println!("After wait ");
-        let reply = docker_api::DockerReply {
-            message: info.to_string(),
+        println!("After wait {}", info);
+        let reply = docker_api::DockerInfoReply {
+            info: serde_json::to_string_pretty(&info).unwrap(),
         };
         Ok(Response::new(reply))
     }

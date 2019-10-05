@@ -27,7 +27,7 @@ package docker_api;
 // }
 
 service GetDocker {
-  rpc GetDockerInfo (DockerRequest) returns (DockerReply) {}
+  rpc GetDockerInfo (DockerInfoRequest) returns (DockerInfoReply) {}
   rpc GetDockerImages (DockerRequest) returns (DockerReply) {}
 }
 // The request message containing the user's name.
@@ -46,4 +46,12 @@ message DockerRequest {
 
 message DockerReply {
   string message = 1;
+}
+
+message DockerInfoRequest {
+  string name = 1;
+}
+
+message DockerInfoReply {
+  string info = 1;
 }

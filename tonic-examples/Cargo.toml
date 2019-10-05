@@ -5,12 +5,12 @@ authors = ["Lucio Franco <luciofranco14@gmail.com>"]
 edition = "2018"
 
 [[bin]]
-name = "helloworld-server"
-path = "src/helloworld/server.rs"
+name = "docker-server"
+path = "src/docker_api/server.rs"
 
 [[bin]]
-name = "helloworld-client"
-path = "src/helloworld/client.rs"
+name = "docker-client"
+path = "src/docker_api/client.rs"
 
 [[bin]]
 name = "routeguide-server"
